@@ -2,6 +2,17 @@ use strum_macros::Display;
 use rand::prelude::*;
 use rand::distributions::WeightedIndex;
 
+const PLANET_NUMBER_MINIMUM: u8 = 3;
+const PLANET_NUMBER_MAXIMUM: u8 = 12;
+
+// In millions of years
+const STAR_AGE_MINIMUM: u16 = 1;
+const STAR_AGE_MAXIMUM: u16 = 13000;
+
+// In stellar mass (M☉)
+const STAR_MASS_MINIMUM: u8 = 1;
+const STAR_MASS_MAXIMUM: u8 = 150;
+
 #[derive(Display)]
 enum StarClass {
     O, B, A, F, G, K, M,
@@ -10,21 +21,36 @@ enum StarClass {
     SuperGiant,
 }
 
+struct Star {
+    class: StarClass,
+    mass: u8,
+    age: u16,
+}
+
 struct PlanetarySystem {
-    star: StarClass,
-    planets: i8,
+    star: Star,
+    planets: u8,
 }
 
 impl PlanetarySystem {
+
     fn new() -> Self {
+
+        let mut rng = rand::thread_rng();
+
         PlanetarySystem {
-            star: Self::chose_star_class(),
-            planets: 8,
+            star: Star {
+                class: Self::chose_star_class(),
+                mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
+                age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
+            },
+            planets: rng.gen_range(PLANET_NUMBER_MINIMUM..PLANET_NUMBER_MAXIMUM),
         }
     }
 
     fn chose_star_class() -> StarClass {
-        let abundance = vec![0.8, 0.0828, 0.035, 0.02, 0.007, 0.001, 0.0001, 0.05, 0.004, 0.0001];
+        let abundance = vec![0.8, 0.0828, 0.035, 0.02, 0.007,
+                             0.001, 0.0001, 0.05, 0.004, 0.0001];
         let random_index = generate_weighted_random_number(&abundance);
         match random_index {
             0 => StarClass::M,
@@ -50,5 +76,7 @@ fn generate_weighted_random_number(weights: &[f64]) -> usize {
 
 fn main() {
     let solar_system = PlanetarySystem::new();
-    println!("There is an {} star that has {} planets.", solar_system.star, solar_system.planets);
+    println!("There is an {} star that is {} million years old and weighs {} M☉. \
+    It has {} planets.", solar_system.star.class, solar_system.star.age,
+             solar_system.star.mass, solar_system.planets);
 }
