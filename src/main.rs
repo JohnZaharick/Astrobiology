@@ -1,6 +1,7 @@
 use strum_macros::Display;
 use rand::prelude::*;
 use rand::distributions::WeightedIndex;
+use std::io;
 
 const PLANET_NUMBER_MINIMUM: u8 = 3;
 const PLANET_NUMBER_MAXIMUM: u8 = 12;
@@ -74,9 +75,37 @@ fn generate_weighted_random_number(weights: &[f64]) -> usize {
     dist.sample(&mut rng)
 }
 
-fn main() {
+fn explore_system() -> String {
     let solar_system = PlanetarySystem::new();
-    println!("There is an {} star that is {} million years old and weighs {} M☉. \
-    It has {} planets.", solar_system.star.class, solar_system.star.age,
-             solar_system.star.mass, solar_system.planets);
+    format!("There is an {} star that is {} million years old and weighs {} M☉. \
+            It has {} planets.", solar_system.star.class, solar_system.star.age,
+             solar_system.star.mass, solar_system.planets)
+}
+
+fn main() {
+
+    println!("------------------------");
+    println!("A S T R O B I O L O G Y");
+    println!("------------------------");
+    println!();
+    println!("Press ENTER to explore a system. Type QUIT and ENTER to end game.");
+
+    loop {
+
+        let mut input = String::new();
+
+        io::stdin()
+            .read_line(&mut input)
+            .expect("Failed to read line.");
+
+        match &input.trim() as &str {
+            "QUIT" => {
+                println!("Thanks for playing!");
+                break;
+            }
+            _ => {
+                println!("{}", explore_system());
+            }
+        }
+    }
 }
