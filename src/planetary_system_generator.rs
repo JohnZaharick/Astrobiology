@@ -23,7 +23,7 @@ impl PlanetarySystem {
 
 pub fn explore_system() -> String {
     let solar_system = PlanetarySystem::new();
-    format!("There is an {} star that is {} million years old and weighs {} M☉. \
-            It has {} planets.", solar_system.star.class, solar_system.star.age,
-            solar_system.star.mass, solar_system.planets)
+    format!("There is an {} star that is {}, {} million years old, and weighs {} M☉. \
+            It has {} planets.", solar_system.star.class, solar_system.star.color,
+            solar_system.star.age, solar_system.star.mass, solar_system.planets)
 }

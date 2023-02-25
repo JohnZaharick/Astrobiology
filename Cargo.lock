@@ -7,6 +7,7 @@ name = "astrobiology"
 version = "0.1.0"
 dependencies = [
  "rand",
+ "rand_derive2",
  "strum_macros",
 ]
 
@@ -55,6 +56,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "proc_macro2_helper"
+version = "0.2.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "de7d18393e9ef5104442cde71ea51a7fcca8e2dbba4285887176ce78da3ac799"
+dependencies = [
+ "proc-macro2",
+ "syn",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -91,6 +102,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ec0be4795e2f6a28069bec0b5ff3e2ac9bafc99e6a9a7dc3547996c5c816922c"
 dependencies = [
  "getrandom",
+]
+
+[[package]]
+name = "rand_derive2"
+version = "0.1.18"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "528731a2ca9c0d978eee2e56c19e57923f3df96d0fca8009e0e204acaef52d01"
+dependencies = [
+ "proc-macro2",
+ "proc_macro2_helper",
+ "quote",
+ "syn",
 ]
 
 [[package]]
