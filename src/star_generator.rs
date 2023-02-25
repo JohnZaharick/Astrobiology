@@ -2,6 +2,7 @@ use strum_macros::Display;
 use rand::prelude::*;
 use rand::distributions::WeightedIndex;
 use rand_derive2::RandGen;
+use lazy_static::lazy_static;
 
 // TODO: Make unique age and mass ranges for each StarClass.
 
@@ -12,6 +13,17 @@ const STAR_AGE_MAXIMUM: u16 = 13000;
 // In stellar mass (M☉)
 const STAR_MASS_MINIMUM: u8 = 1;
 const STAR_MASS_MAXIMUM: u8 = 150;
+
+const M_STAR_ABUNDANCE: f64 = 0.8;
+const K_STAR_ABUNDANCE: f64 = 0.0828;
+const G_STAR_ABUNDANCE: f64 = 0.035;
+const F_STAR_ABUNDANCE: f64 = 0.02;
+const A_STAR_ABUNDANCE: f64 = 0.007;
+const B_STAR_ABUNDANCE: f64 = 0.001;
+const O_STAR_ABUNDANCE: f64 = 0.0001;
+const WHITE_DWARF_STAR_ABUNDANCE: f64 = 0.05;
+const GIANT_STAR_ABUNDANCE: f64 = 0.004;
+const SUPER_GIANT_STAR_ABUNDANCE: f64 = 0.0001;
 
 #[derive(Display)]
 pub enum StarClass {
@@ -33,74 +45,92 @@ pub struct Star {
     pub age: u16,
 }
 
+lazy_static! {
+    static ref STARS: Vec<(StarClass,f64)> = vec![
+            (StarClass::M, M_STAR_ABUNDANCE),
+            (StarClass::K, K_STAR_ABUNDANCE),
+            (StarClass::G, G_STAR_ABUNDANCE),
+            (StarClass::F, F_STAR_ABUNDANCE),
+            (StarClass::A, A_STAR_ABUNDANCE),
+            (StarClass::B, B_STAR_ABUNDANCE),
+            (StarClass::O, O_STAR_ABUNDANCE),
+            (StarClass::WhiteDwarf, WHITE_DWARF_STAR_ABUNDANCE),
+            (StarClass::Giant, GIANT_STAR_ABUNDANCE),
+            (StarClass::SuperGiant, SUPER_GIANT_STAR_ABUNDANCE),
+            ];
+    }
+
 impl Star {
     pub fn new() -> Star {
         let mut rng = rand::thread_rng();
-        let abundance = vec![0.8, 0.0828, 0.035, 0.02, 0.007,
-                             0.001, 0.0001, 0.05, 0.004, 0.0001];
+
+        let mut abundance: Vec<f64> = Vec::new();
+        for i in STARS.iter() {
+            abundance.push(i.1);
+        };
+
         let random_index = Self::generate_weighted_random_number(&abundance);
-        match random_index {
-            0 =>         Star {
+        match STARS[random_index].0 {
+            StarClass::M =>         Star {
                 class: StarClass::M,
                 color: StarColor::Red,
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            1 =>         Star {
+            StarClass::K =>         Star {
                 class: StarClass::K,
                 color: StarColor::Orange,
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            2 => Star {
+            StarClass::G => Star {
                 class: StarClass::G,
                 color: StarColor::Yellow,
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            3 => Star {
+            StarClass::F => Star {
                 class: StarClass::F,
                 color: StarColor::White,
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            4 => Star {
+            StarClass::A => Star {
                 class: StarClass::A,
                 color: StarColor::White,
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            5 => Star {
+            StarClass::B => Star {
                 class: StarClass::B,
                 color: StarColor::Blue,
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            6 => Star {
+            StarClass::O => Star {
                 class: StarClass::O,
                 color: StarColor::Blue,
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            7 => Star {
+            StarClass::WhiteDwarf => Star {
                 class: StarClass::WhiteDwarf,
                 color: StarColor::White,
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            8 => Star {
+            StarClass::Giant => Star {
                 class: StarClass::Giant,
                 color: random(),
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            9 => Star {
+            StarClass::SuperGiant => Star {
                 class: StarClass::SuperGiant,
                 color: random(),
                 mass: rng.gen_range(STAR_MASS_MINIMUM..STAR_MASS_MAXIMUM),
                 age: rng.gen_range(STAR_AGE_MINIMUM..STAR_AGE_MAXIMUM),
             },
-            _ => panic!("abundance[] has more indices than there are star classes!")
         }
     }
 
