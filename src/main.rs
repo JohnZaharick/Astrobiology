@@ -1,5 +1,6 @@
 mod planetary_system_generator;
 mod star_generator;
+mod planet_generator;
 
 use std::io;
 
