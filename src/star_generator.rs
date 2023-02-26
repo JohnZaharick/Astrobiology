@@ -58,18 +58,15 @@ lazy_static! {
             (StarClass::Giant, GIANT_STAR_ABUNDANCE),
             (StarClass::SuperGiant, SUPER_GIANT_STAR_ABUNDANCE),
             ];
+
+    static ref ABUNDANCE: Vec<f64> = STARS.iter().map(|x| x.1).collect();
     }
 
 impl Star {
     pub fn new() -> Star {
         let mut rng = rand::thread_rng();
 
-        let mut abundance: Vec<f64> = Vec::new();
-        for i in STARS.iter() {
-            abundance.push(i.1);
-        };
-
-        let random_index = Self::generate_weighted_random_number(&abundance);
+        let random_index = Self::generate_weighted_random_number(&ABUNDANCE);
         match STARS[random_index].0 {
             StarClass::M =>         Star {
                 class: StarClass::M,
