@@ -18,14 +18,15 @@ impl PlanetarySystem {
         PlanetarySystem {
             star: star_generator::Star::new(),
             planets: planet_generator::Planet::planets(
-                rng.gen_range(PLANET_NUMBER_MINIMUM..PLANET_NUMBER_MAXIMUM + 1)),
+                rng.gen_range(PLANET_NUMBER_MINIMUM..=PLANET_NUMBER_MAXIMUM)),
         }
     }
 }
 
 pub fn explore_system() -> String {
     let solar_system = PlanetarySystem::new();
-    format!("There is an {} star that is {}, {} million years old, and weighs {} M☉. \
+    format!("There is an {} star that is {}, {} million years old, weighs {} M☉, and is {} K. \
             It has {} planets.", solar_system.star.class, solar_system.star.color,
-            solar_system.star.age, solar_system.star.mass, solar_system.planets.len())
+            solar_system.star.age, solar_system.star.mass, solar_system.star.temperature,
+            solar_system.planets.len())
 }
