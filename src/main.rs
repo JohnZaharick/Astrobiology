@@ -7,6 +7,67 @@ use std::io;
 
 const STARS_IN_GALAXY: usize = 100;
 
+enum Commands {
+    Coord(usize),
+    Up,
+    Explore,
+    Invalid,
+}
+
+enum Scene {
+    Galaxy,
+    Star,
+}
+
+fn parse_input(vec_length: usize, scene: &Scene) -> Commands {
+    let mut input = String::new();
+
+    io::stdin()
+        .read_line(&mut input)
+        .expect("Failed to read line.");
+
+    match input.trim().parse::<usize>() {
+        Ok(index) => {
+            if index < vec_length{
+                Commands::Coord(index)
+            }
+            else {
+                Commands::Invalid
+            }
+        }
+        Err(_) => {
+            match input.trim() as &str {
+                "QUIT" => {
+                    match scene {
+                        Scene::Galaxy => {
+                            Commands::Up
+                        }
+                        Scene::Star => {
+                            Commands::Invalid
+                        }
+                    }
+                }
+                "UP" => {
+                    match scene {
+                        Scene::Galaxy => {
+                            Commands::Invalid
+                        }
+                        Scene::Star => {
+                            Commands::Up
+                        }
+                    }
+                }
+                "EXPLORE" => {
+                    Commands::Explore
+                }
+                _ => {
+                    Commands::Invalid
+                }
+            }
+        }
+    }
+}
+
 fn print_title_screen(){
     println!("------------------------");
     println!("A S T R O B I O L O G Y");
@@ -20,40 +81,25 @@ fn explore_galaxy(number_of_stars: usize) {
     let galaxy = galaxy_generator::Galaxy::new(number_of_stars);
     println!("{}", galaxy.get_info());
 
-    let mut coord: usize = STARS_IN_GALAXY;
+    let mut coord: usize = 0;
+    let scene = Scene::Galaxy;
 
     loop {
-        let mut input = String::new();
-
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read line.");
-
-        match input.trim().parse::<usize>() {
-            Ok(index) => {
-                if index < STARS_IN_GALAXY {
-                    println!(
-                        "{}",
-                        &galaxy.stars[index].get_info()
-                    );
-                    println!("Type EXPLORE to travel to this star.");
-                    coord = index;
-                }
-                else { println!("Invalid coordinates.") }
+        let command: Commands = parse_input(galaxy.stars.len(), &scene);
+        match command {
+            Commands::Coord(index) => {
+                println!("{}", &galaxy.stars[index].get_info());
+                println!("Type EXPLORE to travel to this star.");
+                coord = index;
             }
-            Err(_) => {
-                match input.trim() as &str {
-                    "QUIT" => {
-                        println!("Thanks for playing!");
-                        break;
-                    }
-                    "EXPLORE" => {
-                        explore_planetary_system(galaxy.stars[coord].clone());
-                    }
-                    _ => {
-                        println!("Invalid coordinates.")
-                    }
-                }
+            Commands::Up => {
+                break;
+            }
+            Commands::Explore => {
+                explore_planetary_system(galaxy.stars[coord].clone());
+            }
+            Commands::Invalid => {
+                println!("Invalid coordinates.")
             }
         }
     }
@@ -63,40 +109,26 @@ fn explore_planetary_system(star: star_generator::Star)  {
     let solar_system = planetary_system_generator::PlanetarySystem::new(star);
     println!("{}", solar_system.get_info());
 
-    // let mut coord: usize = solar_system.planets.len();
+    // let mut coord: usize = 0;
+    let scene = Scene::Star;
 
     loop {
-        let mut input = String::new();
-
-        io::stdin()
-            .read_line(&mut input)
-            .expect("Failed to read line.");
-
-        match input.trim().parse::<usize>() {
-            Ok(index) => {
-                if index < solar_system.planets.len() {
-                    println!(
-                        "{}",
-                        &solar_system.planets[index].get_info()
-                    );
-                    println!("Type UP to return to the galactic view.")
-                    // coord = index;
-                }
-                else { println!("Invalid coordinates.") }
+        let command: Commands = parse_input(solar_system.planets.len(), &scene);
+        match command {
+            Commands::Coord(index) => {
+                println!("{}", &solar_system.planets[index].get_info());
+                println!("Type UP to return to the galactic view.")
+                // coord = index;
             }
-            Err(_) => {
-                match input.trim() as &str {
-                    "UP" => {
-                        println!("Enter a star's value to measure its properties. Type QUIT and ENTER to end game.");
-                        break;
-                    }
-                    // "EXPLORE" => {
-                    //     explore_planet(solar_system.planets.remove(coord));
-                    // }
-                    _ => {
-                        println!("Invalid coordinates.")
-                    }
-                }
+            Commands::Up => {
+                break;
+            }
+            Commands::Explore => {
+                // explore_planet(solar_system.planets.remove(coord));
+                println!("TO DO");
+            }
+            Commands::Invalid => {
+                println!("Invalid coordinates.");
             }
         }
     }
@@ -105,4 +137,5 @@ fn explore_planetary_system(star: star_generator::Star)  {
 fn main() {
     print_title_screen();
     explore_galaxy(STARS_IN_GALAXY);
+    println!("Thanks for playing!");
 }
