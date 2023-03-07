@@ -141,8 +141,8 @@ lazy_static! {
 }
 
 impl Star {
-    pub fn new() -> Star {
-        let mut rng = rand::thread_rng();
+    pub fn new(star_seed: u64) -> Star {
+        let mut rng = StdRng::seed_from_u64(star_seed);
         let random_index = Self::generate_weighted_random_number(&ABUNDANCE, &mut rng);
 
         match STARS[random_index].0 {

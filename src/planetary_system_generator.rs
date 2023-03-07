@@ -13,7 +13,7 @@ pub struct PlanetarySystem {
 
 impl PlanetarySystem {
     pub fn new(star: star_generator::Star) -> Self {
-        let mut rng = rand::thread_rng();
+        let mut rng = StdRng::seed_from_u64(*&star.age as u64);
 
         PlanetarySystem {
             planets: planet_generator::Planet::planets(

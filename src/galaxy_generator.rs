@@ -8,8 +8,8 @@ impl Galaxy {
     pub fn new(number_of_stars: usize) -> Galaxy {
         let mut stars = Vec::new();
 
-        for _temp in 1..=number_of_stars {
-            stars.push(star_generator::Star::new());
+        for i in 1..=number_of_stars {
+            stars.push(star_generator::Star::new(i as u64));
         }
 
         Galaxy { stars }

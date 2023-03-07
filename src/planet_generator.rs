@@ -1,10 +1,11 @@
 use rand::prelude::*;
-use rand_derive2::RandGen;
 use strum_macros::Display;
+use strum_macros::EnumIter;
+use strum::IntoEnumIterator;
 
 use crate::star_generator;
 
-#[derive(Display, RandGen)]
+#[derive(Display, EnumIter)]
 pub enum PlanetClass {
     Rocky,
     GasGiant,
@@ -27,8 +28,17 @@ pub struct Planet {
 
 impl Planet {
     fn new(star: &star_generator::Star, distance: u8) -> Planet {
+
+        let mut planet_classes = Vec::new();
+        for planet in PlanetClass::iter() {
+            planet_classes.push(planet);
+        }
+        let seed: u64 = star.age as u64 * distance as u64;
+        let mut rng = StdRng::seed_from_u64(seed);
+        let planet_class = rng.gen_range(0..planet_classes.len());
+
         Planet {
-            class: random(),
+            class: planet_classes.remove(planet_class),
             distance_from_star: distance,
             habitable: if star.age > 1000 { true } else { false },
         }
