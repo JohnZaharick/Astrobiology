@@ -16,12 +16,20 @@ impl PlanetarySystem {
         let mut rng = StdRng::seed_from_u64(*&star.age as u64);
 
         PlanetarySystem {
-            planets: planet_generator::Planet::planets(
+            planets: Self::planets(
                 &star,
                 rng.gen_range(PLANET_NUMBER_MINIMUM..=PLANET_NUMBER_MAXIMUM),
             ),
             star,
         }
+    }
+
+    fn planets(star: &star_generator::Star, count: u8) -> Vec<planet_generator::Planet> {
+        let mut planets = Vec::new();
+        for i in 1..count {
+            planets.push(planet_generator::Planet::new(star, i));
+        }
+        planets
     }
 
     pub fn get_info(&self) -> String{

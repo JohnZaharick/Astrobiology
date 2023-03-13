@@ -36,8 +36,8 @@ fn parse_input(vec_length: usize, scene: &Scene) -> Commands {
             }
         }
         Err(_) => {
-            match input.trim() as &str {
-                "QUIT" => {
+            match &input.trim().to_lowercase() as &str {
+                "quit" => {
                     match scene {
                         Scene::Galaxy => {
                             Commands::Up
@@ -47,7 +47,7 @@ fn parse_input(vec_length: usize, scene: &Scene) -> Commands {
                         }
                     }
                 }
-                "UP" => {
+                "up" => {
                     match scene {
                         Scene::Galaxy => {
                             Commands::Invalid
@@ -57,7 +57,7 @@ fn parse_input(vec_length: usize, scene: &Scene) -> Commands {
                         }
                     }
                 }
-                "EXPLORE" => {
+                "explore" => {
                     Commands::Explore
                 }
                 _ => {

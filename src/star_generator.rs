@@ -3,7 +3,6 @@ use rand::distributions::WeightedIndex;
 use rand::prelude::*;
 use rand_derive2::RandGen;
 use std::collections::HashMap;
-use std::hash::Hash;
 use strum_macros::Display;
 
 // In millions of years
