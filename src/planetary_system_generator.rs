@@ -12,8 +12,10 @@ pub struct PlanetarySystem {
 }
 
 impl PlanetarySystem {
-    pub fn new(star: star_generator::Star) -> Self {
-        let mut rng = StdRng::seed_from_u64(*&star.age as u64);
+    pub fn new(coord: u64) -> Self {
+        let mut rng = StdRng::seed_from_u64(coord);
+
+        let star = star_generator::Star::new(coord);
 
         PlanetarySystem {
             planets: Self::planets(
@@ -32,7 +34,16 @@ impl PlanetarySystem {
         planets
     }
 
-    pub fn get_info(&self) -> String{
+    pub fn get_planet_info(&self, index: usize) -> String {
+        if index < self.planets.len() {
+            self.planets[index].get_info()
+        }
+        else {
+            format!("Invalid coordinates.")
+        }
+    }
+
+    pub fn get_planetary_system_info(&self) -> String{
         let mut s = String::new();
         for i in 0..self.planets.len() {
             s.push_str(&self.planets[i].class.to_string());
@@ -40,6 +51,6 @@ impl PlanetarySystem {
             s.push_str(&i.to_string());
             s.push_str(" ");
         }
-        format!("There are {} planets: {}", &self.planets.len(), s)
+        format!("{} It has {} planets: {}", &self.star.get_info(), &self.planets.len(), s)
     }
 }

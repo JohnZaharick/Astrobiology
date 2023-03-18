@@ -5,17 +5,26 @@ pub struct Galaxy {
 }
 
 impl Galaxy {
-    pub fn new(number_of_stars: usize) -> Galaxy {
+    pub fn new(number_of_stars: u64) -> Galaxy {
         let mut stars = Vec::new();
 
-        for i in 1..=number_of_stars {
+        for i in 0..number_of_stars {
             stars.push(star_generator::Star::new(i as u64));
         }
 
         Galaxy { stars }
     }
 
-    pub fn get_info(&self) -> String{
+    pub fn get_star_info(&self, index: usize) -> String {
+        if index < self.stars.len() {
+            self.stars[index].get_info()
+        }
+        else {
+            format!("Invalid coordinates.")
+        }
+    }
+
+    pub fn get_galaxy_info(&self) -> String{
         let mut s = String::new();
         for i in 0..self.stars.len() {
             s.push_str(&self.stars[i].class.to_string());
@@ -25,4 +34,5 @@ impl Galaxy {
         }
         format!("{}", s)
     }
+
 }
