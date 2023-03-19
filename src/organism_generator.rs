@@ -1,5 +1,7 @@
 use strum_macros::Display;
 
+use crate::planet_generator;
+
 #[derive(Display)]
 pub enum Size {
     SingleCell,
@@ -49,7 +51,7 @@ pub struct Organism {
 }
 
 impl Organism {
-    pub fn new () -> Organism {
+    pub fn new (planet: &planet_generator::Planet) -> Organism {
         Organism {
             size: Size::SingleCell,
             organization: Organization::Modular,

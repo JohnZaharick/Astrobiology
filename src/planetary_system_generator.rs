@@ -8,25 +8,23 @@ const PLANET_NUMBER_MAXIMUM: u8 = 12;
 
 pub struct PlanetarySystem {
     pub planets: Vec<planet_generator::Planet>,
-    pub star: star_generator::Star,
 }
 
 impl PlanetarySystem {
-    pub fn new(coord: u64) -> Self {
-        let mut rng = StdRng::seed_from_u64(coord);
+    pub fn new(star: &star_generator::Star) -> Self {
+        let mut rng = StdRng::seed_from_u64(star.age as u64);
 
-        let star = star_generator::Star::new(coord);
+        // let star = star_generator::Star::new(coord);
 
         PlanetarySystem {
-            planets: Self::planets(
+            planets: Self::generate_planets(
                 &star,
                 rng.gen_range(PLANET_NUMBER_MINIMUM..=PLANET_NUMBER_MAXIMUM),
             ),
-            star,
         }
     }
 
-    fn planets(star: &star_generator::Star, count: u8) -> Vec<planet_generator::Planet> {
+    fn generate_planets(star: &star_generator::Star, count: u8) -> Vec<planet_generator::Planet> {
         let mut planets = Vec::new();
         for i in 1..count {
             planets.push(planet_generator::Planet::new(star, i));
@@ -51,6 +49,6 @@ impl PlanetarySystem {
             s.push_str(&i.to_string());
             s.push_str(" ");
         }
-        format!("{} It has {} planets: {}", &self.star.get_info(), &self.planets.len(), s)
+        format!("There are {} planets: {}", &self.planets.len(), s)
     }
 }

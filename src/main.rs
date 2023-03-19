@@ -72,19 +72,23 @@ fn print_title_screen(){
 
 // store every possible seed so any scene can be regenerated
 struct Scene<S> {
+    state: S,
     galaxy_size: u64,
-    star_seed: u64,
-    planet_seed: u64,
-    state: S
+    star_seed: star_generator::Star,
+    planet_seed: planet_generator::Planet,
 }
 
 impl Scene<Galaxy> {
     fn new(number_of_stars: u64) -> Self {
+
+        let star = star_generator::Star::new(0);
+        let planet = planet_generator::Planet::new(&star, 1);
+
         Scene {
-            galaxy_size: number_of_stars,
-            star_seed: 0,
-            planet_seed: 0,
             state: galaxy_generator::Galaxy::new(number_of_stars),
+            galaxy_size: number_of_stars,
+            star_seed: star,
+            planet_seed: planet,
         }
     }
 }
@@ -92,10 +96,10 @@ impl Scene<Galaxy> {
 impl From<Scene<Galaxy>> for Scene<PlanetarySystem> {
     fn from(galaxy: Scene<Galaxy>) -> Scene<PlanetarySystem> {
         Scene {
+            state: planetary_system_generator::PlanetarySystem::new(&galaxy.star_seed),
             galaxy_size: galaxy.galaxy_size,
             star_seed: galaxy.star_seed,
-            planet_seed: 0,
-            state: planetary_system_generator::PlanetarySystem::new(galaxy.star_seed),
+            planet_seed: galaxy.planet_seed,
         }
     }
 }
@@ -103,10 +107,10 @@ impl From<Scene<Galaxy>> for Scene<PlanetarySystem> {
 impl From<Scene<PlanetarySystem>> for Scene<Galaxy> {
     fn from(star: Scene<PlanetarySystem>) -> Scene<Galaxy> {
         Scene {
+            state: galaxy_generator::Galaxy::new(star.galaxy_size),
             galaxy_size: star.galaxy_size,
             star_seed: star.star_seed,
-            planet_seed: 0,
-            state: galaxy_generator::Galaxy::new(star.galaxy_size),
+            planet_seed: star.planet_seed,
         }
     }
 }
@@ -114,10 +118,10 @@ impl From<Scene<PlanetarySystem>> for Scene<Galaxy> {
 impl From<Scene<PlanetarySystem>> for Scene<PlanetaryEnvironment> {
     fn from(star: Scene<PlanetarySystem>) -> Scene<PlanetaryEnvironment> {
         Scene {
+            state: planetary_environment_generator::PlanetaryEnvironment::new(&star.planet_seed),
             galaxy_size: star.galaxy_size,
             star_seed: star.star_seed,
-            planet_seed: 0,
-            state: planetary_environment_generator::PlanetaryEnvironment::new(star.planet_seed),
+            planet_seed: star.planet_seed,
         }
     }
 }
@@ -125,10 +129,10 @@ impl From<Scene<PlanetarySystem>> for Scene<PlanetaryEnvironment> {
 impl From<Scene<PlanetaryEnvironment>> for Scene<PlanetarySystem> {
     fn from(planet: Scene<PlanetaryEnvironment>) -> Scene<PlanetarySystem> {
         Scene {
+            state: planetary_system_generator::PlanetarySystem::new(&planet.star_seed),
             galaxy_size: planet.galaxy_size,
             star_seed: planet.star_seed,
-            planet_seed: 0,
-            state: planetary_system_generator::PlanetarySystem::new(planet.star_seed),
+            planet_seed: planet.planet_seed,
         }
     }
 }
@@ -140,18 +144,17 @@ enum SceneId {
 }
 
 impl SceneId {
-    fn step_in(mut self, seed: u64) -> Self {
+    fn step_in(mut self, seed: usize) -> Self {
         self = match self {
             SceneId::Galaxy(mut scene) => {
-                scene.star_seed = seed;
+                scene.star_seed = scene.state.stars.remove(seed);
                 SceneId::Star(scene.into())
             },
             SceneId::Star(mut scene) => {
-                scene.planet_seed = seed;
+                scene.planet_seed = scene.state.planets.remove(seed);
                 SceneId::Planet(scene.into())
             },
             SceneId::Planet(mut scene) => {
-                scene.planet_seed = seed;
                 SceneId::Planet(scene.into())
             },
         };
@@ -203,7 +206,7 @@ fn main() {
     print_title_screen();
 
     let mut game = Game::new();
-    let mut coord: u64 = 0;
+    let mut coord: usize = 0;
 
     if let SceneId::Galaxy(scene) = &game.scene_id {
         println!("{}", &scene.state.get_galaxy_info());
@@ -221,7 +224,7 @@ fn main() {
                     SceneId::Planet(scene) =>
                         println!("{}", &scene.state.get_organism_info(index)),
                 }
-                coord = index as u64;
+                coord = index;
             }
             Commands::Explore => {
                 game.scene_id = game.scene_id.step_in(coord);
