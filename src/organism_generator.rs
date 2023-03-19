@@ -1,43 +1,51 @@
-enum Size {
+use strum_macros::Display;
+
+#[derive(Display)]
+pub enum Size {
     SingleCell,
     MultiCellular,
 }
 
-enum Organization {
+#[derive(Display)]
+pub enum Organization {
     Modular,
     Unitary,
 }
 
-enum Symmetry {
+#[derive(Display)]
+pub enum Symmetry {
     Asymmetrical,
     Spherical,
     Radial,
     Bilateral,
 }
 
-enum Solvent {
-    Water,
-    Ammonia,
-}
-
-enum Structure {
+#[derive(Display)]
+pub enum Structure {
     CarbonHydrogen,
     Oxocarbon,
     Silicone,
 }
 
-enum Metabolism {
+#[derive(Display)]
+pub enum Solvent {
+    Water,
+    Ammonia,
+}
+
+#[derive(Display)]
+pub enum Metabolism {
     Aerobic,
     Anaerobic,
 }
 
 pub struct Organism {
-    size: Size,
-    organization: Organization,
-    symmetry: Symmetry,
-    solvent: Solvent,
-    structure: Structure,
-    metabolism: Metabolism,
+    pub size: Size,
+    pub organization: Organization,
+    pub symmetry: Symmetry,
+    pub structure: Structure,
+    pub solvent: Solvent,
+    pub metabolism: Metabolism,
 }
 
 impl Organism {
@@ -46,9 +54,16 @@ impl Organism {
             size: Size::SingleCell,
             organization: Organization::Modular,
             symmetry: Symmetry::Asymmetrical,
-            solvent: Solvent::Water,
             structure: Structure::CarbonHydrogen,
+            solvent: Solvent::Water,
             metabolism: Metabolism::Anaerobic,
         }
+    }
+
+    pub fn get_info(&self) -> String{
+        format!("This organism is {} and {}, has {} symmetry, is made of {}, uses {} for a solvent,\
+         and is {}.", &self.size, &self.organization,
+                &self.symmetry, &self.structure, &self.solvent,
+                &self.metabolism)
     }
 }
