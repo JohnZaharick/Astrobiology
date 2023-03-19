@@ -2,6 +2,8 @@ mod galaxy_generator;
 mod planet_generator;
 mod planetary_system_generator;
 mod star_generator;
+mod planetary_environment_generator;
+mod organism_generator;
 
 use std::io;
 use std::io::Write;
