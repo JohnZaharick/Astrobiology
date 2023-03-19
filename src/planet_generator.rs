@@ -19,7 +19,7 @@ pub enum PlanetClass {
 }
 
 #[derive(PartialEq)]
-enum Ocean {
+pub enum Ocean {
     Water,
     Ammonia,
     None,
@@ -32,6 +32,7 @@ pub struct Planet {
     pub magnetic_field: bool,
     pub pressure: u32,
     pub temperature: u16,
+    pub ocean: Ocean,
     pub habitable: bool,
 }
 
@@ -53,7 +54,8 @@ impl Planet {
         // TODO: pressure needs to be influenced by mass; small planets can't have high pressures; large planets can't have low pressures
         let pressure = rng.gen_range(0..10) * 10_u32.pow(rng.gen_range(0..8));
         let temperature = Self::calculate_temperature(distance, &star, pressure);
-        let habitable = if Self::thalassogenesis(temperature, pressure) != Ocean::None
+        let ocean = Self::thalassogenesis(temperature, pressure);
+        let habitable = if ocean != Ocean::None
             && magnetic_field && star.age > MINIMUM_STAR_AGE_FOR_LIFE { true } else { false };
 
         Planet {
@@ -63,6 +65,7 @@ impl Planet {
             magnetic_field,
             pressure,
             temperature,
+            ocean,
             habitable,
         }
     }

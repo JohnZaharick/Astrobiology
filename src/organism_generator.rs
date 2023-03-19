@@ -1,6 +1,7 @@
 use strum_macros::Display;
 
 use crate::planet_generator;
+use crate::planet_generator::Ocean;
 
 #[derive(Display)]
 pub enum Size {
@@ -22,6 +23,9 @@ pub enum Symmetry {
     Bilateral,
 }
 
+// Terrestrial life is made of C-H chains
+// C-O chains will form in environments poor in H
+// S-O chains will form in high temperatures that prevent C chains from forming
 #[derive(Display)]
 pub enum Structure {
     CarbonHydrogen,
@@ -52,12 +56,20 @@ pub struct Organism {
 
 impl Organism {
     pub fn new (planet: &planet_generator::Planet) -> Organism {
+
+        let solvent = match planet.ocean {
+            Ocean::Water => { Solvent::Water }
+            Ocean::Ammonia => { Solvent::Ammonia }
+            Ocean::None => {
+                panic!("Should not have been able to enter organism_generator without an ocean!") }
+        };
+
         Organism {
             size: Size::SingleCell,
             organization: Organization::Modular,
             symmetry: Symmetry::Asymmetrical,
             structure: Structure::CarbonHydrogen,
-            solvent: Solvent::Water,
+            solvent,
             metabolism: Metabolism::Anaerobic,
         }
     }
