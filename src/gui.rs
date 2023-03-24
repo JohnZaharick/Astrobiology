@@ -2,17 +2,20 @@ use piston_window::*;
 use find_folder;
 use textwrap;
 use std::collections::HashMap;
+use lazy_static::lazy_static;
 
 use crate::galaxy_generator;
+use crate::galaxy_generator::Galaxy;
 use crate::star_generator;
 use crate::star_generator::StarColor;
+use crate::planetary_system_generator;
+use crate::planetary_system_generator::PlanetarySystem;
 
 const WINDOW_WIDTH: u32 = 640;
 const WINDOW_HEIGHT: u32 = 480;
 
-pub fn render_galaxy(galaxy: &galaxy_generator::Galaxy){
-
-    let color_map: HashMap<star_generator::StarColor, [f32; 4]> = HashMap::from([
+lazy_static! {
+        static ref color_map: HashMap<star_generator::StarColor, [f32; 4]> = HashMap::from([
         (
             StarColor::Red,
             [1.0, 0.2, 0.2, 1.0]
@@ -34,8 +37,11 @@ pub fn render_galaxy(galaxy: &galaxy_generator::Galaxy){
             [1.0, 1.0, 1.0, 1.0]
         ),
     ]);
+}
 
-    let mut window: PistonWindow = WindowSettings::new("Hello Piston!", [WINDOW_WIDTH, WINDOW_HEIGHT])
+pub fn render_galaxy(galaxy: &Galaxy){
+
+    let mut window: PistonWindow = WindowSettings::new("Astrobiology", [WINDOW_WIDTH, WINDOW_HEIGHT])
         .exit_on_esc(true)
         .build()
         .unwrap();
@@ -43,11 +49,6 @@ pub fn render_galaxy(galaxy: &galaxy_generator::Galaxy){
     while let Some(event) = window.next() {
         window.draw_2d(&event, |c, g, _| {
             clear([0.0; 4], g);
-
-            // rectangle([1.0, 0.0, 0.0, 1.0], // red color
-            //           [0.0, 0.0, 100.0, 100.0], // rectangle position and size
-            //           c.transform, g);
-
         });
 
         let mut n = 0;
@@ -55,15 +56,41 @@ pub fn render_galaxy(galaxy: &galaxy_generator::Galaxy){
             for j in 1..=10 {
                 if n == galaxy.stars.len() { break; }
                 window.draw_2d(&event, |c, g, _| {
-                    ellipse(color_map[&galaxy.stars[n].color], // red color
+                    ellipse(color_map[&galaxy.stars[n].color], // color
                             [(j * 40) as f64, (i * 30) as f64, 15.0, 15.0], // ellipse position and size
                             c.transform, g);
                 });
                 n += 1;
             }
         }
+    }
+}
 
+pub fn render_planetary_system(star: &star_generator::Star, planetary_system: &PlanetarySystem){
 
+    let mut window: PistonWindow = WindowSettings::new("Astrobiology", [WINDOW_WIDTH, WINDOW_HEIGHT])
+        .exit_on_esc(true)
+        .build()
+        .unwrap();
+
+    while let Some(event) = window.next() {
+        window.draw_2d(&event, |c, g, _| {
+            clear([0.0; 4], g);
+        });
+
+        window.draw_2d(&event, |c, g, _| {
+            ellipse(color_map[&star.color], // color
+                    [50.0, 50.0, 50.0, 50.0], // ellipse position and size
+                    c.transform, g);
+        });
+
+        for i in 1..=planetary_system.planets.len() {
+            window.draw_2d(&event, |c, g, _| {
+                ellipse([1.0; 4], // color
+                        [((i * 40) + 100) as f64, 67.0, 15.0, 15.0], // ellipse position and size
+                        c.transform, g);
+            });
+        }
     }
 }
 

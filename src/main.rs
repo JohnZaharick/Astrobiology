@@ -224,9 +224,10 @@ fn main() {
                 match &game.scene_id {
                     SceneId::Galaxy(scene) =>
                         println!("{}", &scene.state.get_star_info(index)),
-                        // render(&scene.state.get_star_info(index)),
+                        //gui::render_galaxy(&scene.state),
                     SceneId::Star(scene) =>
                         println!("{}", &scene.state.get_planet_info(index)),
+                        //gui::render_planetary_system(&scene.star_seed, &scene.state),
                     SceneId::Planet(scene) =>
                         println!("{}", &scene.state.get_organism_info(index)),
                 }
