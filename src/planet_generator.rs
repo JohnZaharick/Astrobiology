@@ -1,7 +1,6 @@
 use rand::prelude::*;
 use strum_macros::Display;
 use strum_macros::EnumIter;
-use strum::IntoEnumIterator;
 
 use crate::star_generator;
 
@@ -10,7 +9,7 @@ const ATMOSPHERIC_INSULATION: u16 = 150; // in kelvins
 const DISTANCE_FROM_STAR_MODIFIER: u16 = 4; // for calibrating how much temperature drops with distance from a star
 const MINIMUM_STAR_AGE_FOR_LIFE: u16 = 1000; // in millions of years
 
-#[derive(Display, EnumIter)]
+#[derive(Display)]
 pub enum PlanetClass {
     Rocky,
     GasGiant,
@@ -28,7 +27,7 @@ pub enum Ocean {
 pub struct Planet {
     pub class: PlanetClass,
     pub distance_from_star: u8,
-    pub mass: u8,
+    pub mass: u32,
     pub magnetic_field: bool,
     pub pressure: u32,
     pub temperature: u16,
@@ -39,17 +38,12 @@ pub struct Planet {
 impl Planet {
     pub fn new(star: &star_generator::Star, distance: u8) -> Planet {
 
-        let mut planet_classes = Vec::new();
-        for planet in PlanetClass::iter() {
-            planet_classes.push(planet);
-        }
-
         let seed: u64 = star.age as u64 * distance as u64;
         let mut rng = StdRng::seed_from_u64(seed);
-        let planet_class = rng.gen_range(0..planet_classes.len());
 
-        // TODO: mass needs to be influenced by class
-        let mass = rng.gen_range(1..10);
+        // let planet_class = rng.gen_range(0..planet_classes.len());
+        let size = Self::calculate_mass_and_class(&mut rng, distance);
+
         let magnetic_field = if rng.gen_range(0..2) == 0 { false } else { true };
         // TODO: pressure needs to be influenced by mass; small planets can't have high pressures; large planets can't have low pressures
         let pressure = rng.gen_range(0..10) * 10_u32.pow(rng.gen_range(0..8));
@@ -59,14 +53,37 @@ impl Planet {
             && magnetic_field && star.age > MINIMUM_STAR_AGE_FOR_LIFE { true } else { false };
 
         Planet {
-            class: planet_classes.remove(planet_class),
+            class: size.1,
             distance_from_star: distance,
-            mass,
+            mass: size.0,
             magnetic_field,
             pressure,
             temperature,
             ocean,
             habitable,
+        }
+    }
+
+    fn calculate_mass_and_class (rng: &mut impl Rng, distance: u8) -> (u32, PlanetClass) {
+        // TODO: Incorporate star age in calculations to allow Hot Jupiters
+        let mut mass = rng.gen_range(100..10000);
+        if distance < 6 {
+            if mass <= 1000 {
+                (mass, PlanetClass::Dwarf)
+            } else {
+                (mass, PlanetClass::Rocky)
+            }
+        } else {
+            if mass <= 1000 {
+                (mass, PlanetClass::Dwarf)
+            } else {
+                mass = rng.gen_range(100000..1000000);
+                if mass <= 500000 {
+                    (mass, PlanetClass::IceGiant)
+                } else {
+                    (mass, PlanetClass::GasGiant)
+                }
+            }
         }
     }
 
