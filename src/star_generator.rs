@@ -75,7 +75,7 @@ pub enum StarClass {
     SuperGiant,
 }
 
-#[derive(Display, RandGen, Clone)]
+#[derive(Display, RandGen, Clone, Hash, Eq, PartialEq)]
 pub enum StarColor {
     Red,
     Yellow,

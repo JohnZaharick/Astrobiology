@@ -1,3 +1,4 @@
+mod gui;
 mod galaxy_generator;
 mod planet_generator;
 mod planetary_system_generator;
@@ -144,13 +145,15 @@ enum SceneId {
 }
 
 impl SceneId {
-    fn step_in(mut self, seed: usize) -> Self {
+    fn step_in(mut self, mut seed: usize) -> Self {
         self = match self {
             SceneId::Galaxy(mut scene) => {
+                if seed >= scene.state.stars.len() { seed = 0; }
                 scene.star_seed = scene.state.stars.remove(seed);
                 SceneId::Star(scene.into())
             },
             SceneId::Star(mut scene) => {
+                if seed >= scene.state.planets.len() { seed = 0; }
                 scene.planet_seed = scene.state.planets.remove(seed);
                 SceneId::Planet(scene.into())
             },
@@ -210,15 +213,18 @@ fn main() {
 
     if let SceneId::Galaxy(scene) = &game.scene_id {
         println!("{}", &scene.state.get_galaxy_info());
+        // gui::render_galaxy(&scene.state);
     }
 
     loop {
         let command: Commands = parse_input();
+
         match command {
             Commands::Coord(index) => {
                 match &game.scene_id {
                     SceneId::Galaxy(scene) =>
                         println!("{}", &scene.state.get_star_info(index)),
+                        // render(&scene.state.get_star_info(index)),
                     SceneId::Star(scene) =>
                         println!("{}", &scene.state.get_planet_info(index)),
                     SceneId::Planet(scene) =>
