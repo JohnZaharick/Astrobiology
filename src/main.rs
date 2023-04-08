@@ -205,8 +205,12 @@ impl Game {
     }
 }
 
+
+
 fn main() {
     print_title_screen();
+
+    gui::launch_gui();
 
     let mut game = Game::new();
     let mut coord: usize = 0;

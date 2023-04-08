@@ -107,3 +107,8 @@ impl Planet {
                 &self.magnetic_field, &self.habitable)
     }
 }
+
+// Notes:
+// Fulton Gap - Dearth of planets between 1.5 and 2 Earth radii.
+// Neptune is 17 times the mass of Earth; 3.9 Earth radii
+// Sub-Neptunes are 1.7 to 3.9 Earth radii
