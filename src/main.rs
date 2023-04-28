@@ -1,3 +1,4 @@
+mod state_machine;
 mod galaxy_generator;
 mod planet_generator;
 mod planetary_system_generator;
@@ -70,152 +71,12 @@ fn print_title_screen(){
     println!();
 }
 
-// store every possible seed so any scene can be regenerated
-struct Scene<S> {
-    state: S,
-    galaxy_size: u64,
-    star_seed: star_generator::Star,
-    planet_seed: planet_generator::Planet,
-}
 
-impl Scene<Galaxy> {
-    fn new(number_of_stars: u64) -> Self {
-
-        let star = star_generator::Star::new(0);
-        let planet = planet_generator::Planet::new(&star, 1);
-
-        Scene {
-            state: galaxy_generator::Galaxy::new(number_of_stars),
-            galaxy_size: number_of_stars,
-            star_seed: star,
-            planet_seed: planet,
-        }
-    }
-}
-
-impl From<Scene<Galaxy>> for Scene<PlanetarySystem> {
-    fn from(galaxy: Scene<Galaxy>) -> Scene<PlanetarySystem> {
-        Scene {
-            state: planetary_system_generator::PlanetarySystem::new(&galaxy.star_seed),
-            galaxy_size: galaxy.galaxy_size,
-            star_seed: galaxy.star_seed,
-            planet_seed: galaxy.planet_seed,
-        }
-    }
-}
-
-impl From<Scene<PlanetarySystem>> for Scene<Galaxy> {
-    fn from(star: Scene<PlanetarySystem>) -> Scene<Galaxy> {
-        Scene {
-            state: galaxy_generator::Galaxy::new(star.galaxy_size),
-            galaxy_size: star.galaxy_size,
-            star_seed: star.star_seed,
-            planet_seed: star.planet_seed,
-        }
-    }
-}
-
-impl From<Scene<PlanetarySystem>> for Scene<PlanetaryEnvironment> {
-    fn from(star: Scene<PlanetarySystem>) -> Scene<PlanetaryEnvironment> {
-        Scene {
-            state: planetary_environment_generator::PlanetaryEnvironment::new(&star.planet_seed),
-            galaxy_size: star.galaxy_size,
-            star_seed: star.star_seed,
-            planet_seed: star.planet_seed,
-        }
-    }
-}
-
-impl From<Scene<PlanetaryEnvironment>> for Scene<PlanetarySystem> {
-    fn from(planet: Scene<PlanetaryEnvironment>) -> Scene<PlanetarySystem> {
-        Scene {
-            state: planetary_system_generator::PlanetarySystem::new(&planet.star_seed),
-            galaxy_size: planet.galaxy_size,
-            star_seed: planet.star_seed,
-            planet_seed: planet.planet_seed,
-        }
-    }
-}
-
-enum SceneId {
-    Galaxy(Scene<Galaxy>),
-    Star(Scene<PlanetarySystem>),
-    Planet(Scene<PlanetaryEnvironment>),
-}
-
-impl SceneId {
-    fn get_system_info(&self) -> String {
-        match &self {
-            SceneId::Galaxy(scene) =>
-                scene.state.get_galaxy_info(),
-            SceneId::Star(scene) =>
-                scene.state.get_planetary_system_info(),
-            SceneId::Planet(scene) =>
-                scene.state.get_planet_info(),
-        }
-    }
-
-    fn get_unit_info(&self, index: usize) -> String {
-        match &self {
-            SceneId::Galaxy(scene) =>
-                scene.state.get_star_info(index),
-            SceneId::Star(scene) =>
-                scene.state.get_planet_info(index),
-            SceneId::Planet(scene) =>
-                scene.state.get_organism_info(index),
-        }
-    }
-}
-
-impl SceneId {
-    fn step_in(mut self, mut seed: usize) -> Self {
-        self = match self {
-            SceneId::Galaxy(mut scene) => {
-                if seed >= scene.state.stars.len() { seed = 0; }
-                scene.star_seed = scene.state.stars.remove(seed);
-                SceneId::Star(scene.into())
-            },
-            SceneId::Star(mut scene) => {
-                if seed >= scene.state.planets.len() { seed = 0; }
-                scene.planet_seed = scene.state.planets.remove(seed);
-                SceneId::Planet(scene.into())
-            },
-            SceneId::Planet(mut scene) => {
-                SceneId::Planet(scene.into())
-            },
-        };
-        self
-    }
-
-    fn step_out(mut self) -> Self {
-        self = match self {
-            SceneId::Galaxy(scene) =>
-                SceneId::Galaxy(scene.into()),
-            SceneId::Star(scene) =>
-                SceneId::Galaxy(scene.into()),
-            SceneId::Planet(scene) =>
-                SceneId::Star(scene.into()),
-        };
-        self
-    }
-}
-
-struct Game {
-    scene_id: SceneId,
-}
-
-impl Game {
-    fn new() -> Self {
-        Game {
-            scene_id: SceneId::Galaxy(Scene::new(STARS_IN_GALAXY)),
-        }
-    }
-}
 
 fn main() {
     print_title_screen();
 
-    let mut game = Game::new();
+    let mut game = state_machine::Game::new(STARS_IN_GALAXY);
     let mut coord: usize = 0;
 
     println!("{}", game.scene_id.get_system_info());
