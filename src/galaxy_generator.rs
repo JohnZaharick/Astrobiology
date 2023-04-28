@@ -34,5 +34,4 @@ impl Galaxy {
         }
         format!("{}", s)
     }
-
 }

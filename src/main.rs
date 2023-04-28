@@ -144,6 +144,30 @@ enum SceneId {
 }
 
 impl SceneId {
+    fn get_system_info(&self) -> String {
+        match &self {
+            SceneId::Galaxy(scene) =>
+                scene.state.get_galaxy_info(),
+            SceneId::Star(scene) =>
+                scene.state.get_planetary_system_info(),
+            SceneId::Planet(scene) =>
+                scene.state.get_planet_info(),
+        }
+    }
+
+    fn get_unit_info(&self, index: usize) -> String {
+        match &self {
+            SceneId::Galaxy(scene) =>
+                scene.state.get_star_info(index),
+            SceneId::Star(scene) =>
+                scene.state.get_planet_info(index),
+            SceneId::Planet(scene) =>
+                scene.state.get_organism_info(index),
+        }
+    }
+}
+
+impl SceneId {
     fn step_in(mut self, mut seed: usize) -> Self {
         self = match self {
             SceneId::Galaxy(mut scene) => {
@@ -160,14 +184,6 @@ impl SceneId {
                 SceneId::Planet(scene.into())
             },
         };
-        match &self {
-            SceneId::Galaxy(scene) =>
-                println!("{}", &scene.state.get_galaxy_info()),
-            SceneId::Star(scene) =>
-                println!("{}", &scene.state.get_planetary_system_info()),
-            SceneId::Planet(scene) =>
-                println!("{}", &scene.state.get_planet_info()),
-        };
         self
     }
 
@@ -179,14 +195,6 @@ impl SceneId {
                 SceneId::Galaxy(scene.into()),
             SceneId::Planet(scene) =>
                 SceneId::Star(scene.into()),
-        };
-        match &self {
-            SceneId::Galaxy(scene) =>
-                println!("{}", &scene.state.get_galaxy_info()),
-            SceneId::Star(scene) =>
-                println!("{}", &scene.state.get_planetary_system_info()),
-            SceneId::Planet(scene) =>
-                println!("{}", &scene.state.get_planet_info()),
         };
         self
     }
@@ -204,41 +212,29 @@ impl Game {
     }
 }
 
-
-
 fn main() {
     print_title_screen();
 
     let mut game = Game::new();
     let mut coord: usize = 0;
 
-    if let SceneId::Galaxy(scene) = &game.scene_id {
-        println!("{}", &scene.state.get_galaxy_info());
-        // gui::render_galaxy(&scene.state);
-    }
+    println!("{}", game.scene_id.get_system_info());
 
     loop {
         let command: Commands = parse_input();
 
         match command {
             Commands::Coord(index) => {
-                match &game.scene_id {
-                    SceneId::Galaxy(scene) =>
-                        println!("{}", &scene.state.get_star_info(index)),
-                        //gui::render_galaxy(&scene.state),
-                    SceneId::Star(scene) =>
-                        println!("{}", &scene.state.get_planet_info(index)),
-                        //gui::render_planetary_system(&scene.star_seed, &scene.state),
-                    SceneId::Planet(scene) =>
-                        println!("{}", &scene.state.get_organism_info(index)),
-                }
+                println!("{}", &game.scene_id.get_unit_info(index));
                 coord = index;
             }
             Commands::Explore => {
                 game.scene_id = game.scene_id.step_in(coord);
+                println!("{}", game.scene_id.get_system_info());
             }
             Commands::Leave => {
                 game.scene_id = game.scene_id.step_out();
+                println!("{}", game.scene_id.get_system_info());
             }
             Commands::Exit => {
                 break;
@@ -248,6 +244,5 @@ fn main() {
             }
         }
     }
-
     println!("Thanks for playing!");
 }
