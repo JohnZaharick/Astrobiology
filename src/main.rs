@@ -1,4 +1,3 @@
-mod gui;
 mod galaxy_generator;
 mod planet_generator;
 mod planetary_system_generator;
@@ -209,8 +208,6 @@ impl Game {
 
 fn main() {
     print_title_screen();
-
-    gui::launch_gui();
 
     let mut game = Game::new();
     let mut coord: usize = 0;
