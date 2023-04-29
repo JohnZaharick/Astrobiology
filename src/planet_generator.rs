@@ -8,6 +8,8 @@ const BACKGROUND_TEMPERATURE: u16 = 3; // in kelvins; prevents absolute zero wor
 const ATMOSPHERIC_INSULATION: u16 = 150; // in kelvins
 const DISTANCE_FROM_STAR_MODIFIER: u16 = 4; // for calibrating how much temperature drops with distance from a star
 const MINIMUM_STAR_AGE_FOR_LIFE: u16 = 1000; // in millions of years
+const MINIMUM_MASS_FOR_MAGNETOSPHERE: u32 = 5000; // mass currently has no units and is arbitrary
+const MINIMUM_MASS_FOR_ATMOSPHERE: u32 = 1000;
 
 #[derive(Display)]
 pub enum PlanetClass {
@@ -44,9 +46,9 @@ impl Planet {
         // let planet_class = rng.gen_range(0..planet_classes.len());
         let size = Self::calculate_mass_and_class(&mut rng, distance);
 
-        let magnetic_field = if rng.gen_range(0..2) == 0 { false } else { true };
+        let magnetic_field = if size.0 >= MINIMUM_MASS_FOR_MAGNETOSPHERE { true } else { false };
         // TODO: pressure needs to be influenced by mass; small planets can't have high pressures; large planets can't have low pressures
-        let pressure = rng.gen_range(0..10) * 10_u32.pow(rng.gen_range(0..8));
+        let pressure = Self::calculate_pressure(&mut rng, size.0);
         let temperature = Self::calculate_temperature(distance, &star, pressure);
         let ocean = Self::thalassogenesis(temperature, pressure);
         let habitable = if ocean != Ocean::None
@@ -84,6 +86,15 @@ impl Planet {
                     (mass, PlanetClass::GasGiant)
                 }
             }
+        }
+    }
+
+    fn calculate_pressure (rng: &mut impl Rng, mass: u32) -> u32 {
+        if mass > MINIMUM_MASS_FOR_ATMOSPHERE {
+            rng.gen_range(1..10) * 10_u32.pow(rng.gen_range(0..8))
+        }
+        else {
+            0
         }
     }
 
