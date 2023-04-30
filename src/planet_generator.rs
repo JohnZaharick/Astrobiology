@@ -5,7 +5,9 @@ use strum_macros::EnumIter;
 use crate::star_generator;
 
 const BACKGROUND_TEMPERATURE: u16 = 3; // in kelvins; prevents absolute zero worlds
+const PRESSURE_AT_WHICH_INSULATION_OCCURS: u32 = 10000;
 const ATMOSPHERIC_INSULATION: u16 = 150; // in kelvins
+const MAX_TEMP_FOR_ATMOSPHERE_ON_SMALL_WORLDS: u16 = 100; // in kelvins
 const DISTANCE_FROM_STAR_MODIFIER: u16 = 4; // for calibrating how much temperature drops with distance from a star
 const MINIMUM_STAR_AGE_FOR_LIFE: u16 = 1000; // in millions of years
 const MINIMUM_MASS_FOR_MAGNETOSPHERE: u32 = 5000; // mass currently has no units and is arbitrary
@@ -43,14 +45,10 @@ impl Planet {
         let seed: u64 = star.age as u64 * distance as u64;
         let mut rng = StdRng::seed_from_u64(seed);
 
-        // let planet_class = rng.gen_range(0..planet_classes.len());
         let size = Self::calculate_mass_and_class(&mut rng, distance);
-
+        let atmosphere = Self::calculate_temperature_and_pressure(distance, &star, &mut rng, size.0);
         let magnetic_field = if size.0 >= MINIMUM_MASS_FOR_MAGNETOSPHERE { true } else { false };
-        // TODO: pressure needs to be influenced by mass; small planets can't have high pressures; large planets can't have low pressures
-        let pressure = Self::calculate_pressure(&mut rng, size.0);
-        let temperature = Self::calculate_temperature(distance, &star, pressure);
-        let ocean = Self::thalassogenesis(temperature, pressure);
+        let ocean = Self::thalassogenesis(atmosphere.0, atmosphere.1);
         let habitable = if ocean != Ocean::None
             && magnetic_field && star.age > MINIMUM_STAR_AGE_FOR_LIFE { true } else { false };
 
@@ -59,8 +57,8 @@ impl Planet {
             distance_from_star: distance,
             mass: size.0,
             magnetic_field,
-            pressure,
-            temperature,
+            pressure: atmosphere.1,
+            temperature: atmosphere.0,
             ocean,
             habitable,
         }
@@ -89,19 +87,17 @@ impl Planet {
         }
     }
 
-    fn calculate_pressure (rng: &mut impl Rng, mass: u32) -> u32 {
-        if mass > MINIMUM_MASS_FOR_ATMOSPHERE {
-            rng.gen_range(1..10) * 10_u32.pow(rng.gen_range(0..8))
+    fn calculate_temperature_and_pressure (distance: u8, star: &star_generator::Star, rng: &mut impl Rng, mass: u32) -> (u16, u32){
+        // TODO: pressure needs to scale with mass; small planets can't have high pressures;
+        // large planets can't have low pressures
+        let mut temperature: u16 = &star.temperature / (distance as u16 * distance as u16 * DISTANCE_FROM_STAR_MODIFIER)
+            + BACKGROUND_TEMPERATURE;
+        let mut pressure: u32 = 0;
+        if mass > MINIMUM_MASS_FOR_ATMOSPHERE || temperature < MAX_TEMP_FOR_ATMOSPHERE_ON_SMALL_WORLDS {
+            pressure = rng.gen_range(1..10) * 10_u32.pow(rng.gen_range(0..8));
         }
-        else {
-            0
-        }
-    }
-
-    fn calculate_temperature (distance: u8, star: &star_generator::Star, pressure: u32) -> u16 {
-        let atmospheric_insulation = if pressure > 0 { ATMOSPHERIC_INSULATION } else { 0 };
-        &star.temperature / (distance as u16 * distance as u16 * DISTANCE_FROM_STAR_MODIFIER)
-            + BACKGROUND_TEMPERATURE + atmospheric_insulation
+        if pressure > PRESSURE_AT_WHICH_INSULATION_OCCURS { temperature += ATMOSPHERIC_INSULATION };
+        (temperature, pressure)
     }
 
     fn thalassogenesis (temperature: u16, pressure: u32) -> Ocean {
