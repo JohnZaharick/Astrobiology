@@ -7,14 +7,12 @@ const PLANET_NUMBER_MINIMUM: u8 = 3;
 const PLANET_NUMBER_MAXIMUM: u8 = 12;
 
 pub struct PlanetarySystem {
-    pub planets: Vec<planet_generator::Planet>,
+    planets: Vec<planet_generator::Planet>,
 }
 
 impl PlanetarySystem {
     pub fn new(star: &star_generator::Star) -> Self {
         let mut rng = StdRng::seed_from_u64(star.age as u64);
-
-        // let star = star_generator::Star::new(coord);
 
         PlanetarySystem {
             planets: Self::generate_planets(
@@ -32,15 +30,6 @@ impl PlanetarySystem {
         planets
     }
 
-    pub fn get_planet_info(&self, index: usize) -> String {
-        if index < self.planets.len() {
-            self.planets[index].get_info()
-        }
-        else {
-            format!("Invalid coordinates.")
-        }
-    }
-
     pub fn get_planetary_system_info(&self) -> String{
         let mut s = String::new();
         for i in 0..self.planets.len() {
@@ -50,5 +39,23 @@ impl PlanetarySystem {
             s.push_str(" ");
         }
         format!("There are {} planets: {}", &self.planets.len(), s)
+    }
+
+    pub fn get_planet_info(&self, index: usize) -> String {
+        if index < self.planets.len() {
+            self.planets[index].get_info()
+        }
+        else {
+            format!("Invalid coordinates.")
+        }
+    }
+
+    pub fn get_planet(&mut self, index: usize) -> planet_generator::Planet {
+        if index < self.planets.len() {
+            self.planets.remove(index)
+        }
+        else {
+            self.planets.remove(0)
+        }
     }
 }

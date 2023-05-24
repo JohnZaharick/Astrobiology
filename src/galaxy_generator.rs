@@ -1,7 +1,7 @@
 use crate::star_generator;
 
 pub struct Galaxy {
-    pub stars: Vec<star_generator::Star>,
+    stars: Vec<star_generator::Star>,
 }
 
 impl Galaxy {
@@ -15,15 +15,6 @@ impl Galaxy {
         Galaxy { stars }
     }
 
-    pub fn get_star_info(&self, index: usize) -> String {
-        if index < self.stars.len() {
-            self.stars[index].get_info()
-        }
-        else {
-            format!("Invalid coordinates.")
-        }
-    }
-
     pub fn get_galaxy_info(&self) -> String{
         let mut s = String::new();
         for i in 0..self.stars.len() {
@@ -33,5 +24,23 @@ impl Galaxy {
             s.push_str(" ");
         }
         format!("{}", s)
+    }
+
+    pub fn get_star_info(&self, index: usize) -> String {
+        if index < self.stars.len() {
+            self.stars[index].get_info()
+        }
+        else {
+            format!("Invalid coordinates.")
+        }
+    }
+
+    pub fn get_star(&mut self, index: usize) -> star_generator::Star {
+        if index < self.stars.len() {
+            self.stars.remove(index)
+        }
+        else {
+            self.stars.remove(0)
+        }
     }
 }

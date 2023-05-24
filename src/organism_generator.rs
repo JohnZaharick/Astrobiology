@@ -1,4 +1,6 @@
 use strum_macros::Display;
+use rand::prelude::*;
+use rand::distributions::{Alphanumeric, DistString};
 
 use crate::planet_generator;
 use crate::planet_generator::Ocean;
@@ -30,7 +32,7 @@ pub enum Symmetry {
 pub enum Structure {
     CarbonHydrogen,
     Oxocarbon,
-    Silicone,
+    Siloxane,
 }
 
 #[derive(Display)]
@@ -46,6 +48,7 @@ pub enum Metabolism {
 }
 
 pub struct Organism {
+    pub name: String,
     pub size: Size,
     pub organization: Organization,
     pub symmetry: Symmetry,
@@ -55,7 +58,9 @@ pub struct Organism {
 }
 
 impl Organism {
-    pub fn new (planet: &planet_generator::Planet) -> Organism {
+    pub fn new (planet: &planet_generator::Planet, seed: u64) -> Organism {
+
+        let mut rng = StdRng::seed_from_u64(seed);
 
         let solvent = match planet.ocean {
             Ocean::Water => { Solvent::Water }
@@ -65,6 +70,7 @@ impl Organism {
         };
 
         Organism {
+            name: Alphanumeric.sample_string(&mut rng, 5),
             size: Size::SingleCell,
             organization: Organization::Modular,
             symmetry: Symmetry::Asymmetrical,
@@ -75,8 +81,8 @@ impl Organism {
     }
 
     pub fn get_info(&self) -> String{
-        format!("This organism is {} and {}, has {} symmetry, is made of {}, uses {} for a solvent,\
-         and is {}.", &self.size, &self.organization,
+        format!("This organism is barcoded: {}. It is {} and {}, has {} symmetry, is made of {}, uses {} for a solvent, \
+        and is {}.", &self.name, &self.size, &self.organization,
                 &self.symmetry, &self.structure, &self.solvent,
                 &self.metabolism)
     }

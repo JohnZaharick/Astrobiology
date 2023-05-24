@@ -1,15 +1,15 @@
 use rand::prelude::*;
 
 use crate::planet_generator;
-use crate::organism_generator;
+use crate::organism_generator::Organism;
 use crate::planet_generator::PlanetClass;
 
 const RICHNESS_MINIMUM: u8 = 3;
 const RICHNESS_MAXIMUM: u8 = 12;
 
 pub struct PlanetaryEnvironment {
-    pub moons: usize,
-    pub biosphere: Vec<organism_generator::Organism>,
+    moons: usize,
+    biosphere: Vec<Organism>,
 }
 
 impl PlanetaryEnvironment {
@@ -32,12 +32,12 @@ impl PlanetaryEnvironment {
         }
     }
 
-    fn generate_organisms(planet: &planet_generator::Planet, count: u8) -> Vec<organism_generator::Organism> {
+    fn generate_organisms(planet: &planet_generator::Planet, richness: u8) -> Vec<Organism> {
         let mut organisms = Vec::new();
 
         if planet.habitable {
-            for i in 1..count {
-                organisms.push(organism_generator::Organism::new(planet));
+            for i in 1..richness {
+                organisms.push(Organism::new(planet, (planet.temperature + i as u16) as u64));
             }
         }
         organisms
@@ -48,7 +48,7 @@ impl PlanetaryEnvironment {
             self.biosphere[index].get_info()
         }
         else {
-            format!("Invalid coordinates.")
+             format!("Invalid coordinates.")
         }
     }
 
