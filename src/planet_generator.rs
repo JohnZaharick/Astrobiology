@@ -29,20 +29,20 @@ pub enum Ocean {
 }
 
 pub struct Planet {
-    pub class: PlanetClass,
-    pub distance_from_star: u8,
-    pub mass: u32,
-    pub magnetic_field: bool,
-    pub pressure: u32,
-    pub temperature: u16,
-    pub ocean: Ocean,
-    pub habitable: bool,
+    class: PlanetClass,
+    distance_from_star: u8,
+    mass: u32,
+    magnetic_field: bool,
+    pressure: u32,
+    temperature: u16,
+    ocean: Ocean,
+    habitable: bool,
 }
 
 impl Planet {
     pub fn new(star: &star_generator::Star, distance: u8) -> Planet {
 
-        let seed: u64 = star.age as u64 * distance as u64;
+        let seed: u64 = star.get_age() as u64 * distance as u64;
         let mut rng = StdRng::seed_from_u64(seed);
 
         let size = Self::calculate_mass_and_class(&mut rng, distance);
@@ -50,7 +50,7 @@ impl Planet {
         let magnetic_field = if size.0 >= MINIMUM_MASS_FOR_MAGNETOSPHERE { true } else { false };
         let ocean = Self::thalassogenesis(atmosphere.0, atmosphere.1);
         let habitable = if ocean != Ocean::None
-            && magnetic_field && star.age > MINIMUM_STAR_AGE_FOR_LIFE { true } else { false };
+            && magnetic_field && star.get_age() > MINIMUM_STAR_AGE_FOR_LIFE { true } else { false };
 
         Planet {
             class: size.1,
@@ -90,7 +90,7 @@ impl Planet {
     fn calculate_temperature_and_pressure (distance: u8, star: &star_generator::Star, rng: &mut impl Rng, mass: u32) -> (u16, u32){
         // TODO: pressure needs to scale with mass; small planets can't have high pressures;
         // large planets can't have low pressures
-        let mut temperature: u16 = &star.temperature / (distance as u16 * distance as u16 * DISTANCE_FROM_STAR_MODIFIER)
+        let mut temperature: u16 = &star.get_temperature() / (distance as u16 * distance as u16 * DISTANCE_FROM_STAR_MODIFIER)
             + BACKGROUND_TEMPERATURE;
         let mut pressure: u32 = 0;
         if mass > MINIMUM_MASS_FOR_ATMOSPHERE || temperature < MAX_TEMP_FOR_ATMOSPHERE_ON_SMALL_WORLDS {
@@ -112,6 +112,38 @@ impl Planet {
          and it's {} that there is life here.", &self.class, &self.distance_from_star,
                 &self.temperature, &self.pressure, &self.mass,
                 &self.magnetic_field, &self.habitable)
+    }
+
+    pub fn get_class(&self) -> &PlanetClass {
+        &self.class
+    }
+
+    pub fn get_distance(&self) -> u8 {
+        self.distance_from_star
+    }
+
+    pub fn get_mass(&self) -> u32 {
+        self.mass
+    }
+
+    pub fn get_magnetic_field(&self) -> bool {
+        self.magnetic_field
+    }
+
+    pub fn get_pressure(&self) -> u32 {
+        self.pressure
+    }
+
+    pub fn get_temperature(&self) -> u16 {
+        self.temperature
+    }
+
+    pub fn get_ocean(&self) -> &Ocean {
+        &self.ocean
+    }
+
+    pub fn get_habitability(&self) -> bool {
+        self.habitable
     }
 }
 

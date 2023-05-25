@@ -14,9 +14,9 @@ pub struct PlanetaryEnvironment {
 
 impl PlanetaryEnvironment {
     pub fn new (planet: &planet_generator::Planet) -> PlanetaryEnvironment {
-        let mut rng = StdRng::seed_from_u64(planet.temperature as u64);
+        let mut rng = StdRng::seed_from_u64(planet.get_temperature() as u64);
 
-        let number_of_moons = match planet.class {
+        let number_of_moons = match planet.get_class() {
             PlanetClass::Rocky => { rng.gen_range(0..=5) }
             PlanetClass::GasGiant => { rng.gen_range(15..=80) }
             PlanetClass::IceGiant => { rng.gen_range(15..=30) }
@@ -35,9 +35,9 @@ impl PlanetaryEnvironment {
     fn generate_organisms(planet: &planet_generator::Planet, richness: u8) -> Vec<Organism> {
         let mut organisms = Vec::new();
 
-        if planet.habitable {
+        if planet.get_habitability() {
             for i in 1..richness {
-                organisms.push(Organism::new(planet, (planet.temperature + i as u16) as u64));
+                organisms.push(Organism::new(planet, (planet.get_temperature() + i as u16) as u64));
             }
         }
         organisms
@@ -55,7 +55,7 @@ impl PlanetaryEnvironment {
     pub fn get_planet_info(&self) -> String{
         let mut s = String::new();
         for i in 0..self.biosphere.len() {
-            s.push_str(&self.biosphere[i].size.to_string());
+            s.push_str(&self.biosphere[i].get_size().to_string());
             s.push_str("_");
             s.push_str(&i.to_string());
             s.push_str(" ");

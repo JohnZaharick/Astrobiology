@@ -18,7 +18,7 @@ impl Galaxy {
     pub fn get_galaxy_info(&self) -> String{
         let mut s = String::new();
         for i in 0..self.stars.len() {
-            s.push_str(&self.stars[i].class.to_string());
+            s.push_str(&self.stars[i].get_class().to_string());
             s.push_str("_");
             s.push_str(&i.to_string());
             s.push_str(" ");

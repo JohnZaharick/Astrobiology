@@ -48,13 +48,13 @@ pub enum Metabolism {
 }
 
 pub struct Organism {
-    pub name: String,
-    pub size: Size,
-    pub organization: Organization,
-    pub symmetry: Symmetry,
-    pub structure: Structure,
-    pub solvent: Solvent,
-    pub metabolism: Metabolism,
+    name: String,
+    size: Size,
+    organization: Organization,
+    symmetry: Symmetry,
+    structure: Structure,
+    solvent: Solvent,
+    metabolism: Metabolism,
 }
 
 impl Organism {
@@ -62,7 +62,7 @@ impl Organism {
 
         let mut rng = StdRng::seed_from_u64(seed);
 
-        let solvent = match planet.ocean {
+        let solvent = match planet.get_ocean() {
             Ocean::Water => { Solvent::Water }
             Ocean::Ammonia => { Solvent::Ammonia }
             Ocean::None => {
@@ -85,5 +85,33 @@ impl Organism {
         and is {}.", &self.name, &self.size, &self.organization,
                 &self.symmetry, &self.structure, &self.solvent,
                 &self.metabolism)
+    }
+
+    pub fn get_name(&self) -> &String {
+        &self.name
+    }
+
+    pub fn get_size(&self) -> &Size {
+        &self.size
+    }
+
+    pub fn get_organization(&self) -> &Organization {
+        &self.organization
+    }
+
+    pub fn get_symmetry(&self) -> &Symmetry {
+        &self.symmetry
+    }
+
+    pub fn get_structure(&self) -> &Structure {
+        &self.structure
+    }
+
+    pub fn get_solvent(&self) -> &Solvent {
+        &self.solvent
+    }
+
+    pub fn get_metabolism(&self) -> &Metabolism {
+        &self.metabolism
     }
 }

@@ -12,7 +12,7 @@ pub struct PlanetarySystem {
 
 impl PlanetarySystem {
     pub fn new(star: &star_generator::Star) -> Self {
-        let mut rng = StdRng::seed_from_u64(star.age as u64);
+        let mut rng = StdRng::seed_from_u64(star.get_age() as u64);
 
         PlanetarySystem {
             planets: Self::generate_planets(
@@ -33,7 +33,7 @@ impl PlanetarySystem {
     pub fn get_planetary_system_info(&self) -> String{
         let mut s = String::new();
         for i in 0..self.planets.len() {
-            s.push_str(&self.planets[i].class.to_string());
+            s.push_str(&self.planets[i].get_class().to_string());
             s.push_str("_");
             s.push_str(&i.to_string());
             s.push_str(" ");

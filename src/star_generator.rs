@@ -76,7 +76,7 @@ pub enum StarClass {
 }
 
 #[derive(Display, RandGen, Clone, Hash, Eq, PartialEq)]
-pub enum StarColor {
+enum StarColor {
     Red,
     Yellow,
     Orange,
@@ -86,11 +86,11 @@ pub enum StarColor {
 
 #[derive(Clone)]
 pub struct Star {
-    pub class: StarClass,
-    pub color: StarColor,
-    pub mass: f64,
-    pub age: u16,
-    pub temperature: u16,
+    class: StarClass,
+    color: StarColor,
+    mass: f64,
+    age: u16,
+    temperature: u16,
 }
 
 lazy_static! {
@@ -250,5 +250,25 @@ impl Star {
             &self.mass,
             &self.temperature,
         )
+    }
+
+    pub fn get_class(&self) -> &StarClass {
+        &self.class
+    }
+
+    pub fn get_color(&self) -> &StarColor {
+        &self.color
+    }
+
+    pub fn get_mass(&self) -> f64 {
+        self.mass
+    }
+
+    pub fn get_age(&self) -> u16 {
+        self.age
+    }
+
+    pub fn get_temperature(&self) -> u16 {
+        self.temperature
     }
 }
