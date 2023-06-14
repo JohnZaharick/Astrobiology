@@ -18,9 +18,9 @@ pub trait Scene {
 
 pub struct Game {
     pub scene: Box <dyn Scene>,
-    pub galaxy_size: u64,
-    pub star_seed: star_generator::Star,
-    pub planet_seed: planet_generator::Planet,
+    galaxy_size: u64,
+    star_seed: star_generator::Star,
+    planet_seed: planet_generator::Planet,
 }
 
 impl Game {
