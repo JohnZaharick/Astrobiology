@@ -1,3 +1,5 @@
+use std::fmt::format;
+use crate::game_manager::{Scene, SceneName};
 use crate::star_generator;
 
 pub struct Galaxy {
@@ -14,8 +16,14 @@ impl Galaxy {
 
         Galaxy { stars }
     }
+}
 
-    pub fn get_galaxy_info(&self) -> String{
+impl Scene for Galaxy {
+    fn get_scene_name(&self) -> SceneName {
+        SceneName::Galaxy
+    }
+    
+    fn get_system_info(&self) -> String {
         let mut s = String::new();
         for i in 0..self.stars.len() {
             s.push_str(&self.stars[i].get_class().to_string());
@@ -26,21 +34,12 @@ impl Galaxy {
         format!("{}", s)
     }
 
-    pub fn get_star_info(&self, index: usize) -> String {
+    fn get_unit_info(&self, index: usize) -> String {
         if index < self.stars.len() {
             self.stars[index].get_info()
         }
         else {
             format!("Invalid coordinates.")
-        }
-    }
-
-    pub fn get_star(&mut self, index: usize) -> star_generator::Star {
-        if index < self.stars.len() {
-            self.stars.remove(index)
-        }
-        else {
-            self.stars.remove(0)
         }
     }
 }

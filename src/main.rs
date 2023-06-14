@@ -1,4 +1,4 @@
-mod state_machine;
+mod game_manager;
 mod galaxy_generator;
 mod planet_generator;
 mod planetary_system_generator;
@@ -11,6 +11,7 @@ use std::io::Write;
 use crate::galaxy_generator::Galaxy;
 use crate::planetary_environment_generator::PlanetaryEnvironment;
 use crate::planetary_system_generator::PlanetarySystem;
+use crate::game_manager::{Game, SceneName};
 
 const STARS_IN_GALAXY: u64 = 100;
 
@@ -71,31 +72,31 @@ fn print_title_screen(){
     println!();
 }
 
-
-
 fn main() {
+
     print_title_screen();
 
-    let mut game = state_machine::Game::new(STARS_IN_GALAXY);
+    let mut game: Game = Game::new(STARS_IN_GALAXY);
+
     let mut coord: usize = 0;
 
-    println!("{}", game.scene_id.get_system_info());
+    println!("{}", game.scene.get_system_info());
 
     loop {
         let command: Commands = parse_input();
 
         match command {
             Commands::Coord(index) => {
-                println!("{}", &game.scene_id.get_unit_info(index));
+                println!("{}", game.scene.get_unit_info(index));
                 coord = index;
             }
             Commands::Explore => {
-                game.scene_id = game.scene_id.step_in(coord);
-                println!("{}", game.scene_id.get_system_info());
+                game.step_in(coord);
+                println!("{}", game.scene.get_system_info());
             }
             Commands::Leave => {
-                game.scene_id = game.scene_id.step_out();
-                println!("{}", game.scene_id.get_system_info());
+                game.step_out();
+                println!("{}", game.scene.get_system_info());
             }
             Commands::Exit => {
                 break;

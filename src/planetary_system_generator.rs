@@ -1,5 +1,6 @@
 use rand::prelude::*;
 
+use crate::game_manager::{Scene, SceneName};
 use crate::planet_generator;
 use crate::star_generator;
 
@@ -29,8 +30,14 @@ impl PlanetarySystem {
         }
         planets
     }
+}
 
-    pub fn get_planetary_system_info(&self) -> String{
+impl Scene for PlanetarySystem {
+    fn get_scene_name(&self) -> SceneName {
+        SceneName::PlanetarySystem
+    }
+
+    fn get_system_info(&self) -> String {
         let mut s = String::new();
         for i in 0..self.planets.len() {
             s.push_str(&self.planets[i].get_class().to_string());
@@ -41,21 +48,12 @@ impl PlanetarySystem {
         format!("There are {} planets: {}", &self.planets.len(), s)
     }
 
-    pub fn get_planet_info(&self, index: usize) -> String {
+    fn get_unit_info(&self, index: usize) -> String {
         if index < self.planets.len() {
             self.planets[index].get_info()
         }
         else {
             format!("Invalid coordinates.")
-        }
-    }
-
-    pub fn get_planet(&mut self, index: usize) -> planet_generator::Planet {
-        if index < self.planets.len() {
-            self.planets.remove(index)
-        }
-        else {
-            self.planets.remove(0)
         }
     }
 }

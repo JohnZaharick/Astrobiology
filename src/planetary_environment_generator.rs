@@ -1,5 +1,6 @@
 use rand::prelude::*;
 
+use crate::game_manager::{Scene, SceneName};
 use crate::planet_generator;
 use crate::organism_generator::Organism;
 use crate::planet_generator::PlanetClass;
@@ -43,16 +44,14 @@ impl PlanetaryEnvironment {
         organisms
     }
 
-    pub fn get_organism_info(&self, index: usize) -> String {
-        if index < self.biosphere.len() {
-            self.biosphere[index].get_info()
-        }
-        else {
-             format!("Invalid coordinates.")
-        }
+}
+
+impl Scene for PlanetaryEnvironment {
+    fn get_scene_name(&self) -> SceneName {
+        SceneName::PlanetaryEnvironment
     }
 
-    pub fn get_planet_info(&self) -> String{
+    fn get_system_info(&self) -> String {
         let mut s = String::new();
         for i in 0..self.biosphere.len() {
             s.push_str(&self.biosphere[i].get_size().to_string());
@@ -61,5 +60,14 @@ impl PlanetaryEnvironment {
             s.push_str(" ");
         }
         format!("There are {} moons and {}", &self.moons, s)
+    }
+
+    fn get_unit_info(&self, index: usize) -> String {
+        if index < self.biosphere.len() {
+            self.biosphere[index].get_info()
+        }
+        else {
+            format!("Invalid coordinates.")
+        }
     }
 }
